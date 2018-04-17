@@ -7,11 +7,16 @@ const port = process.env.PORT || 3000;
 app.use(express.static(__dirname + '/public'));
 
 function onConnection(socket){
-  socket.on('drawing', (data) => {
-    socket.broadcast.emit('drawing', data);
-  });
-  socket.on('reset', (data) => {
-    socket.broadcast.emit('reset', data);
+
+  socket.on('join', (param) => {
+    socket.join(param.room);
+    socket.to(param.room).emit('nice game', "let's play a game");
+    socket.on('drawing', (data) => {
+      socket.to(param.room).emit('drawing', data);
+    });
+    socket.on('reset', (data) => {
+      socket.to(param.room).emit('reset', data);
+    });
   });
 }
 
